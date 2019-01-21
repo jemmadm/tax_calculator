@@ -1,9 +1,26 @@
 package tax;
 
+import java.time.LocalDate;
+
 public class FuelTypeTaxCalculator extends TaxCalculator {
+
+    public boolean firstYearTaxFeatureToggle;
 
     public int calculateTax(Vehicle vehicle) {
         int co2Emissions = vehicle.getCo2Emissions();
+
+        if (firstYearTaxFeatureToggle) {
+            if (vehicle.getDateOfFirstRegistration().getYear() != (LocalDate.now().getYear())) {
+                if (vehicle.getFuelType() == FuelType.ALTERNATIVE_FUEL) {
+                    return 130;
+                } else if (vehicle.getFuelType() == FuelType.ELECTRIC) {
+                    return 0;
+                } else {
+                    return 140;
+                }
+            }
+        }
+
         if (vehicle.getFuelType() == FuelType.PETROL) {
             return petrolRates(co2Emissions);
         } else if (vehicle.getFuelType() == FuelType.DIESEL) {
