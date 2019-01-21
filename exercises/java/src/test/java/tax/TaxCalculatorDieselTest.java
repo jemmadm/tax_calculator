@@ -18,7 +18,7 @@ public class TaxCalculatorDieselTest {
 
     @Before
     public void setUp(){
-        taxCalculator = new DieselTaxCalculator();
+        taxCalculator = new FuelTypeTaxCalculator();
     }
 
     @Test
