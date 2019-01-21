@@ -4,21 +4,19 @@ import java.time.LocalDate;
 
 public class FuelTypeTaxCalculator extends TaxCalculator {
 
-    public boolean firstYearTaxFeatureToggle;
+    public boolean afterFirstYearTaxFeatureToggle = true;
+    public boolean afterFirstYearForExpensiveTaxFeatureToggle = true;
 
     public int calculateTax(Vehicle vehicle) {
         int co2Emissions = vehicle.getCo2Emissions();
 
-        if (firstYearTaxFeatureToggle) {
-            if (vehicle.getDateOfFirstRegistration().getYear() != (LocalDate.now().getYear())) {
-                if (vehicle.getFuelType() == FuelType.ALTERNATIVE_FUEL) {
-                    return 130;
-                } else if (vehicle.getFuelType() == FuelType.ELECTRIC) {
-                    return 0;
-                } else {
-                    return 140;
-                }
-            }
+        if (afterFirstYearForExpensiveTaxFeatureToggle) {
+            Integer rate = afterFirstYearRate(vehicle);
+            if (rate != null) return rate;
+        }
+        if (afterFirstYearTaxFeatureToggle) {
+            Integer rate = afterFirstYearRateForExpensiveVehicles(vehicle);
+            if (rate != null) return rate;
         }
 
         if (vehicle.getFuelType() == FuelType.PETROL) {
@@ -29,6 +27,32 @@ public class FuelTypeTaxCalculator extends TaxCalculator {
             return alternativeFuelRates(co2Emissions);
         }
         return 0;
+    }
+
+    private Integer afterFirstYearRateForExpensiveVehicles(Vehicle vehicle) {
+        if (vehicle.getDateOfFirstRegistration().getYear() != LocalDate.now().getYear()) {
+            if (vehicle.getFuelType() == FuelType.ALTERNATIVE_FUEL) {
+                return 130;
+            } else if (vehicle.getFuelType() == FuelType.ELECTRIC) {
+                return 0;
+            } else {
+                return 140;
+            }
+        }
+        return null;
+    }
+
+    private Integer afterFirstYearRate(Vehicle vehicle) {
+        if (vehicle.getDateOfFirstRegistration().getYear() != LocalDate.now().getYear() && vehicle.getListPrice() > 40000) {
+            if (vehicle.getFuelType() == FuelType.ALTERNATIVE_FUEL) {
+                return 440;
+            } else if (vehicle.getFuelType() == FuelType.ELECTRIC) {
+                return 310;
+            } else {
+                return 450;
+            }
+        }
+        return null;
     }
 
     private int alternativeFuelRates(int co2Emissions) {
